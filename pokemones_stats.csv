@@ -1,0 +1,21 @@
+nombre,tipo,vida,defensa,ataque,velocidad,mov1,daño1,mov2,daño2,imagen,front,back
+Pikachu,Eléctrico,95,14,26,32,Impactrueno,18,Rayo,26,pikachu.png,pikachu_front.gif,pikachu_back.gif
+Jirachi,Psíquico,110,22,24,26,Confusión,18,Cabezazo,25,jirachi.png,jirachi_front.gif,jirachi_back.gif
+Absol,Siniestro,95,14,30,24,Tajo Umbrío,20,Mordida,16,absol.png,absol_front.gif,absol_back.gif
+Banette,Fantasma,90,16,28,20,Bola Sombra,20,Tinieblas,16,banette.png,banette_front.gif,banette_back.gif
+Breloom,Planta,105,18,28,22,Ultrapuño,17,Bomba Germen,24,breloom.png,breloom_front.gif,breloom_back.gif
+Dewott,Agua,110,18,24,21,Pistola Agua,17,Concha Filo,24,dewott.png,dewott_front.gif,dewott_back.gif
+Espeon,Psíquico,95,16,29,30,Psicorrayo,18,Psíquico,25,espeon.png,espeon_front.gif,espeon_back.gif
+Gabite,Dragón,115,19,27,25,Garra Dragón,20,Terratemblor,24,gabite.png,gabite_front.gif,gabite_back.gif
+Grovyle,Planta,95,15,27,29,Hoja Aguda,21,Ataque Rápido,15,grovyle.png,grovyle_front.gif,grovyle_back.gif
+Heracross,Bicho,120,20,30,25,Megacuerno,24,Demolición,18,heracross.png,heracross_front.gif,heracross_back.gif
+Hitmonchan,Lucha,105,22,27,23,Puño Fuego,18,Gancho Alto,24,hitmonchan.png,hitmonchan_front.gif,hitmonchan_back.gif
+Houndoom,Fuego,100,15,30,28,Lanzallamas,22,Triturar,18,houndoom.png,houndoom_front.gif,houndoom_back.gif
+Kirlia,Psíquico,85,16,24,18,Confusión,17,Hoja Mágica,21,kirlia.png,kirlia_front.gif,kirlia_back.gif
+Leafeon,Planta,110,22,25,28,Hoja Afilada,19,Tacleada,16,leafeon.png,leafeon_front.gif,leafeon_back.gif
+Luxio,Eléctrico,95,15,27,21,Chispa,18,Mordida,22,luxio.png,luxio_front.gif,luxio_back.gif
+Monferno,Fuego,100,15,28,26,Rueda Fuego,19,Ultrapuño,22,monferno.png,monferno_front.gif,monferno_back.gif
+Ninetales,Fuego,110,21,24,28,Ascuas,16,Lanzallamas,24,ninetales.png,ninetales_front.gif,ninetales_back.gif
+Primeape,Lucha,105,15,30,28,Golpe Karate,18,A Bocajarro,25,primeape.png,primeape_front.gif,primeape_back.gif
+Seadra,Agua,100,21,25,25,Burbuja,15,Hidropulso,24,seadra.png,seadra_front.gif,seadra_back.gif
+Sharpedo,Agua,90,13,32,29,Acua Jet,17,Triturar,24,sharpedo.png,sharpedo_front.gif,sharpedo_back.gif
