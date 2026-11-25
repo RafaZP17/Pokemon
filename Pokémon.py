@@ -14,9 +14,7 @@ COLORES_TIPO = {
     "ELECTRICO": "#F7D02C", "AGUA": "#6390F0", "FUEGO": "#EE8130",
     "PLANTA": "#7AC74C", "PSIQUICO": "#F95587", "SINIESTRO": "#705746",
     "FANTASMA": "#735797", "DRAGON": "#6F35FC", "LUCHA": "#C22E28",
-    "BICHO": "#A6B91A", "NORMAL": "#A8A77A", "HIELO": "#96D9D6",
-    "TIERRA": "#E2BF65", "ROCA": "#B6A136", "ACERO": "#B7B7CE",
-    "HADA": "#D685AD", "VENENO": "#A33EA1", "VOLADOR": "#A98FF3"
+    "BICHO": "#A6B91A"
 }
 
 menu = ctk.CTk()
@@ -35,8 +33,10 @@ def cargar_Pokemons():
                 continue
 
             nombre = fila[0]
+            tipo_limpio = fila[1].split("/")[0].split("-")[0].strip().upper()
+
             Catalogo_Pokemon[nombre] = {
-                "tipo": fila[1].strip().upper(),
+                "tipo": tipo_limpio,
                 "vida": int(fila[2]),
                 "ataque": int(fila[3]),
                 "defensa": int(fila[4]),
@@ -50,14 +50,12 @@ def cargar_Pokemons():
                 "gif_espalda": f"Pokemones/Back/{fila[12].strip()}" if len(fila) > 12 else ""
             }
 
-
 def limpiar_ventana():
     for anim_id in animaciones:
         menu.after_cancel(anim_id)
     animaciones.clear()
     for widget in menu.winfo_children():
         widget.destroy()
-
 
 def mostrar_menu():
     limpiar_ventana()
@@ -77,7 +75,6 @@ def mostrar_menu():
         height=50,
         command=mostrar_catalogo
     ).pack()
-
 
 def mostrar_catalogo():
     limpiar_ventana()
@@ -186,7 +183,6 @@ def mostrar_catalogo():
         btn.grid(row=i // 4, column=i % 4, padx=9, pady=10)
         botones[nombre] = btn
 
-
 def cargar_frames_tk(ruta_gif, zoom=2.4):
     gif = Image.open(ruta_gif)
     frames = []
@@ -198,16 +194,17 @@ def cargar_frames_tk(ruta_gif, zoom=2.4):
         frames.append(ImageTk.PhotoImage(img))
     return frames
 
-
 def iniciar_batalla():
     limpiar_ventana()
 
     pkm_jugador = Catalogo_Pokemon[pokemon_actual].copy()
     pkm_jugador["nombre"] = pokemon_actual
+    pkm_jugador["vida_max"] = pkm_jugador["vida"]
 
     nombre_rival = random.choice(list(Catalogo_Pokemon))
     pkm_rival = Catalogo_Pokemon[nombre_rival].copy()
     pkm_rival["nombre"] = nombre_rival
+    pkm_rival["vida_max"] = pkm_rival["vida"]
 
     escala = menu._get_window_scaling()
     ancho_real = int(1000 * escala)
@@ -222,10 +219,10 @@ def iniciar_batalla():
 
     ruta_jugador = pkm_jugador["gif_espalda"] or pkm_jugador["gif_frente"]
     frames_jugador = cargar_frames_tk(ruta_jugador, zoom=4 * escala)
-    frames_rival = cargar_frames_tk(pkm_rival["gif_frente"], zoom=2.2 * escala)
+    frames_rival = cargar_frames_tk(pkm_rival["gif_frente"], zoom=2.8 * escala)
 
-    sprite_jugador = escenario.create_image(int(230 * escala), int(340 * escala), image=frames_jugador[0])
-    sprite_rival = escenario.create_image(int(720 * escala), int(210 * escala), image=frames_rival[0])
+    sprite_jugador = escenario.create_image(int(250 * escala), int(340 * escala), image=frames_jugador[0])
+    sprite_rival = escenario.create_image(int(760 * escala), int(150 * escala), image=frames_rival[0])
 
     escenario.imagenes = [fondo_tk, frames_jugador, frames_rival]
 
@@ -240,6 +237,106 @@ def iniciar_batalla():
     if len(frames_rival) > 1:
         animar_sprite(sprite_rival, frames_rival)
 
+    panel_rival = ctk.CTkFrame(menu, width=350, height=95, fg_color="#2B2B2B", border_color="#7D26CD", border_width=2, corner_radius=12)
+    panel_rival.place(x=95, y=20)
+    panel_rival.pack_propagate(False)
+
+    ctk.CTkLabel(panel_rival, text=f"{pkm_rival['nombre'].upper()}", font=("Arial", 14, "bold"), text_color="white").pack(anchor="w", padx=15, pady=(10, 4))
+
+    barra_hp_rival = ctk.CTkProgressBar(panel_rival, width=265, height=18, progress_color="#4CAF50", fg_color="#555555")
+    barra_hp_rival.set(1.0)
+    barra_hp_rival.pack(padx=15, pady=2)
+
+    lbl_hp_rival = ctk.CTkLabel(panel_rival, text=f"HP: {pkm_rival['vida']} / {pkm_rival['vida_max']}", font=("Arial", 12, "bold"), text_color="#CCCCCC")
+    lbl_hp_rival.pack(anchor="e", padx=15, pady=(2, 6))
+
+    panel_jugador = ctk.CTkFrame(menu, width=350, height=95, fg_color="#2B2B2B", border_color="#1E90FF", border_width=2, corner_radius=12)
+    panel_jugador.place(x=550, y=330)
+    panel_jugador.pack_propagate(False)
+
+    ctk.CTkLabel(panel_jugador, text=f"{pkm_jugador['nombre'].upper()}", font=("Arial", 14, "bold"), text_color="white").pack(anchor="w", padx=15, pady=(10, 4))
+
+    barra_hp_jugador = ctk.CTkProgressBar(panel_jugador, width=265, height=18, progress_color="#4CAF50", fg_color="#555555")
+    barra_hp_jugador.set(1.0)
+    barra_hp_jugador.pack(padx=15, pady=2)
+
+    lbl_hp_jugador = ctk.CTkLabel(panel_jugador, text=f"HP: {pkm_jugador['vida']} / {pkm_jugador['vida_max']}", font=("Arial", 12, "bold"), text_color="#CCCCCC")
+    lbl_hp_jugador.pack(anchor="e", padx=15, pady=(2, 6))
+
+    panel_inferior = ctk.CTkFrame(menu, width=1000, height=172, fg_color="#1E1E1E", border_color="#7D26CD", border_width=2, corner_radius=0)
+    panel_inferior.place(x=0, y=430)
+    panel_inferior.pack_propagate(False)
+
+    caja_texto = ctk.CTkFrame(panel_inferior, width=490, height=145, fg_color="#2B2B2B", border_color="#444444", border_width=2, corner_radius=10)
+    caja_texto.place(x=15, y=15)
+    caja_texto.pack_propagate(False)
+
+    lbl_mensaje = ctk.CTkLabel(
+        caja_texto,
+        text=f"¡Un {pkm_rival['nombre'].upper()} salvaje apareció!\n¿Qué debería hacer {pkm_jugador['nombre'].upper()}?",
+        font=("Arial", 15, "bold"),
+        text_color="white",
+        justify="left",
+        wraplength=455
+    )
+    lbl_mensaje.pack(anchor="nw", padx=18, pady=18)
+
+    caja_botones = ctk.CTkFrame(panel_inferior, width=465, height=145, fg_color="transparent")
+    caja_botones.place(x=520, y=15)
+    caja_botones.grid_propagate(False)
+
+    color_tipo = COLORES_TIPO.get(pkm_jugador["tipo"], "#1E90FF")
+
+    btn_move1 = ctk.CTkButton(
+        caja_botones,
+        text=f"{pkm_jugador['move1'].upper()}\n(Daño: {pkm_jugador['dmg1']})",
+        font=("Arial", 13, "bold"),
+        fg_color=color_tipo,
+        text_color="white",
+        width=225,
+        height=65,
+        corner_radius=10
+    )
+    btn_move1.grid(row=0, column=0, padx=(0, 7), pady=(0, 7))
+
+    btn_move2 = ctk.CTkButton(
+        caja_botones,
+        text=f"{pkm_jugador['move2'].upper()}\n(Daño: {pkm_jugador['dmg2']})",
+        font=("Arial", 13, "bold"),
+        fg_color=color_tipo,
+        text_color="white",
+        width=225,
+        height=65,
+        corner_radius=10
+    )
+    btn_move2.grid(row=0, column=1, padx=(7, 0), pady=(0, 7))
+
+    btn_bajar_def = ctk.CTkButton(
+        caja_botones,
+        text="GRITO / BAJAR DEFENSA\n(-Defensa Rival)",
+        font=("Arial", 13, "bold"),
+        fg_color="#D97706",
+        hover_color="#B45309",
+        text_color="white",
+        width=225,
+        height=65,
+        corner_radius=10
+    )
+    btn_bajar_def.grid(row=1, column=0, padx=(0, 7), pady=(7, 0))
+
+    btn_curar = ctk.CTkButton(
+        caja_botones,
+        text="RECUPERACIÓN\n(+Curar Vida)",
+        font=("Arial", 13, "bold"),
+        fg_color="#2E8B57",
+        hover_color="#226B42",
+        text_color="white",
+        width=225,
+        height=65,
+        corner_radius=10
+    )
+    btn_curar.grid(row=1, column=1, padx=(7, 0), pady=(7, 0))
+
     ctk.CTkButton(
         menu,
         text="Cambiar Pokémon",
@@ -249,8 +346,7 @@ def iniciar_batalla():
         width=150,
         height=35,
         command=mostrar_catalogo
-    ).place(x=20, y=20)
-
+    ).place(x=830, y=20)
 
 cargar_Pokemons()
 mostrar_menu()
