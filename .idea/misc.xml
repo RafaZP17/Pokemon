@@ -4,7 +4,7 @@
     <option name="sdkName" value="Python 3.10 (Pokemon)" />
   </component>
   <component name="KubernetesApiProvider"><![CDATA[{}]]></component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.10 (Pokemon)" project-jdk-type="Python SDK">
+  <component name="ProjectRootManager" version="2" project-jdk-name="~\OneDrive\Desktop\pokemon\.venv" project-jdk-type="Python SDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
 </project>
