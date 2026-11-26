@@ -445,30 +445,6 @@ def iniciar_batalla():
     if len(frames_rival) > 1:
         animar_sprite(sprite_rival, frames_rival)
 
-    # --- Botones de control (Nueva Batalla / Volver al Menú) ---
-    ctk.CTkButton(
-        menu,
-        text="Nueva Batalla",
-        font=("Arial", 12, "bold"),
-        fg_color="#1E90FF",
-        hover_color="#1874CD",
-        width=130,
-        height=32,
-        command=iniciar_batalla
-    ).place(x=710, y=15)
-
-    ctk.CTkButton(
-        menu,
-        text="Volver al Menú",
-        font=("Arial", 12, "bold"),
-        fg_color="#C22E28",
-        hover_color="#8B1E1A",
-        width=130,
-        height=32,
-        command=mostrar_menu
-    ).place(x=850, y=15)
-
-    # --- Panel Rival ---
     panel_rival = ctk.CTkFrame(menu, width=350, height=112, fg_color="#2B2B2B", border_color="#7D26CD", border_width=2, corner_radius=12)
     panel_rival.place(x=125, y=20)
     panel_rival.pack_propagate(False)
@@ -508,7 +484,6 @@ def iniciar_batalla():
     lbl_hp_jugador = ctk.CTkLabel(fila_stats_jugador, text=f"HP: {pkm_jugador['vida']} / {pkm_jugador['vida_max']}", font=("Arial", 12, "bold"), text_color="#CCCCCC")
     lbl_hp_jugador.pack(side="right")
 
-    # --- Panel Inferior ---
     panel_inferior = ctk.CTkFrame(menu, width=1000, height=172, fg_color="#1E1E1E", border_color="#7D26CD", border_width=2, corner_radius=0)
     panel_inferior.place(x=0, y=430)
     panel_inferior.pack_propagate(False)
@@ -610,6 +585,28 @@ def iniciar_batalla():
 
                 resultado = "GANASTE" if atacante == pkm_jugador else "PERDISTE"
                 guardar_resultado(resultado)
+
+                ctk.CTkButton(
+                    menu,
+                    text="Nueva Batalla",
+                    font=("Arial", 12, "bold"),
+                    fg_color="#1E90FF",
+                    hover_color="#1874CD",
+                    width=130,
+                    height=32,
+                    command=iniciar_batalla
+                ).place(x=710, y=15)
+
+                ctk.CTkButton(
+                    menu,
+                    text="Volver al Menú",
+                    font=("Arial", 12, "bold"),
+                    fg_color="#C22E28",
+                    hover_color="#8B1E1A",
+                    width=130,
+                    height=32,
+                    command=mostrar_catalogo
+                ).place(x=850, y=15)
 
                 for b in (btn_move1, btn_move2, btn_bajar_def, btn_curar):
                     b.configure(state="disabled")
