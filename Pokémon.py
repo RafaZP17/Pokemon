@@ -1,14 +1,14 @@
 import csv
 import random
+import pygame
 import tkinter as tk
 import customtkinter as ctk
 from PIL import Image, ImageSequence, ImageTk
 
-ctk.set_appearance_mode("dark")
-
 Catalogo_Pokemon = {}
 pokemon_actual = None
 animaciones = []
+pygame.mixer.init()
 
 COLORES_TIPO = {
     "ELECTRICO": "#F7D02C", "AGUA": "#6390F0", "FUEGO": "#EE8130",
@@ -145,8 +145,8 @@ def mostrar_catalogo():
         ctk.CTkLabel(stats, text=f"DEFENSA\n{datos['defensa']}", font=("Arial", 12, "bold"), width=110).grid(row=1, column=0, pady=6)
         ctk.CTkLabel(stats, text=f"VELOCIDAD\n{datos['velocidad']}", font=("Arial", 12, "bold"), width=110).grid(row=1, column=1, pady=6)
 
-        ctk.CTkLabel(panel_der, text=f"{datos['move1'].upper()} - {datos['dmg1']}", font=("Arial", 12, "bold"), fg_color=color, corner_radius=10, width=235, height=34).pack(pady=(12, 6))
-        ctk.CTkLabel(panel_der, text=f"{datos['move2'].upper()} - {datos['dmg2']}", font=("Arial", 12, "bold"), fg_color=color, corner_radius=10, width=235, height=34).pack(pady=6)
+        ctk.CTkLabel(panel_der, text=f"{datos['move1'].upper()} \n(Daño: {datos['dmg1']})", font=("Arial", 12, "bold"), fg_color=color, corner_radius=10, width=235, height=50).pack(pady=(12, 6))
+        ctk.CTkLabel(panel_der, text=f"{datos['move2'].upper()} \n(Daño: {datos['dmg2']})", font=("Arial", 12, "bold"), fg_color=color, corner_radius=10, width=235, height=50).pack(pady=6)
 
         ctk.CTkButton(panel_der, text="SELECCIONAR", font=("Arial", 13, "bold"), fg_color="#1E90FF", hover_color="#1874CD", width=235, height=40, command=iniciar_batalla).pack(side="bottom", pady=20)
 
@@ -199,6 +199,7 @@ def cargar_frames_tk(ruta_gif, zoom):
 
 def iniciar_batalla():
     limpiar_ventana()
+    pygame.mixer.music.stop()
 
     pkm_jugador = Catalogo_Pokemon[pokemon_actual].copy()
     pkm_jugador["nombre"] = pokemon_actual
@@ -216,21 +217,28 @@ def iniciar_batalla():
     escenario = tk.Canvas(menu, width=1000, height=600, highlightthickness=0)
     escenario.pack(fill="both", expand=True)
 
-    fondo_img = Image.open("Pokemones/Fondo/Grass.png").resize((ancho_real, alto_real), Image.Resampling.NEAREST)
+    pygame.mixer.music.load(f"Pokemones/Sonidos/batalla{random.randint(1,3)}.mp3")
+    pygame.mixer.music.set_volume(0.4)
+    pygame.mixer.music.play(-1)
+
+    fondo_img = Image.open(f"Pokemones/Fondo/Fondo{random.randint(1,5)}.png").resize((ancho_real, alto_real), Image.Resampling.NEAREST)
     fondo_tk = ImageTk.PhotoImage(fondo_img)
     escenario.create_image(0, 0, anchor="nw", image=fondo_tk)
 
-    ruta_jugador = pkm_jugador["gif_espalda"] or pkm_jugador["gif_frente"]
+    ruta_jugador = pkm_jugador["gif_espalda"]
     frames_jugador = cargar_frames_tk(ruta_jugador, zoom=4 * escala)
     frames_rival = cargar_frames_tk(pkm_rival["gif_frente"], zoom=2.8 * escala)
 
     sprite_jugador = escenario.create_image(int(250 * escala), int(340 * escala), image=frames_jugador[0])
     sprite_rival = escenario.create_image(int(760 * escala), int(150 * escala), image=frames_rival[0])
 
+    pkm_jugador["sprite"] = sprite_jugador
+    pkm_rival["sprite"] = sprite_rival
+
     escenario.imagenes = [fondo_tk, frames_jugador, frames_rival]
 
     def animar_sprite(item_id, frames, i=0):
-        if escenario.winfo_exists():
+        if escenario.winfo_exists() and item_id in escenario.find_all():
             escenario.itemconfig(item_id, image=frames[i])
             anim_id = menu.after(60, animar_sprite, item_id, frames, (i + 1) % len(frames))
             animaciones.append(anim_id)
@@ -244,7 +252,7 @@ def iniciar_batalla():
     panel_rival.place(x=125, y=20)
     panel_rival.pack_propagate(False)
 
-    ctk.CTkLabel(panel_rival, text=f"{pkm_rival['nombre'].upper()}  (VEL: {pkm_rival['velocidad']})", font=("Arial", 14, "bold")).pack(anchor="w", padx=15, pady=(10, 4))
+    ctk.CTkLabel(panel_rival, text=f"{pkm_rival['nombre'].upper()})", font=("Arial", 14, "bold")).pack(anchor="w", padx=15, pady=(10, 4))
 
     barra_hp_rival = ctk.CTkProgressBar(panel_rival, width=265, height=18, progress_color="#4CAF50", fg_color="#555555")
     barra_hp_rival.set(1.0)
@@ -257,7 +265,7 @@ def iniciar_batalla():
     panel_jugador.place(x=520, y=330)
     panel_jugador.pack_propagate(False)
 
-    ctk.CTkLabel(panel_jugador, text=f"{pkm_jugador['nombre'].upper()}  (VEL: {pkm_jugador['velocidad']})", font=("Arial", 14, "bold")).pack(anchor="w", padx=15, pady=(10, 4))
+    ctk.CTkLabel(panel_jugador, text=f"{pkm_jugador['nombre'].upper()})", font=("Arial", 14, "bold")).pack(anchor="w", padx=15, pady=(10, 4))
 
     barra_hp_jugador = ctk.CTkProgressBar(panel_jugador, width=265, height=18, progress_color="#4CAF50", fg_color="#555555")
     barra_hp_jugador.set(1.0)
@@ -276,7 +284,7 @@ def iniciar_batalla():
 
     lbl_mensaje = ctk.CTkLabel(
         caja_texto,
-        text=f"¡Un {pkm_rival['nombre'].upper()} salvaje apareció!\n¿Qué debería hacer {pkm_jugador['nombre'].upper()}?",
+        text=f"¿Qué debería hacer {pkm_jugador['nombre'].upper()}?",
         font=("Arial", 15, "bold"),
         justify="left",
         wraplength=455
@@ -355,12 +363,31 @@ def iniciar_batalla():
             actualizar_hud()
 
             if defensor["vida"] == 0:
+                escenario.delete(defensor["sprite"])
                 mensajes.append(f"¡{defensor['nombre']} se debilitó! ¡{atacante['nombre']} gana!")
                 lbl_mensaje.configure(text="\n".join(mensajes))
                 guardar_resultado(atacante["nombre"], defensor["nombre"])
+
+                def salir_batalla():
+                    pygame.mixer.music.stop()
+                    mostrar_catalogo()
+
+                ctk.CTkButton(
+                    menu,
+                    text="Finalizar Batalla",
+                    font=("Arial", 12, "bold"),
+                    fg_color="#C22E28",
+                    hover_color="#8B1E1A",
+                    width=150,
+                    height=35,
+                    command= salir_batalla
+                ).place(x=830, y=20)
+
                 for b in (btn_move1, btn_move2, btn_bajar_def, btn_curar):
                     b.configure(state="disabled")
                 return
+
+
 
         lbl_mensaje.configure(text="\n".join(mensajes))
 
