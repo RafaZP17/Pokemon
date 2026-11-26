@@ -1,0 +1,12 @@
+Ganador: Jirachi | Perdedor: Seadra
+Ganador: Jirachi | Perdedor: Monferno
+Ganador: Jirachi | Perdedor: Jirachi
+Ganador: Dewott | Perdedor: Sharpedo
+Ganador: Grovyle | Perdedor: Ninetales
+Ganador: Pikachu | Perdedor: Kirlia
+Ganador: Dewott | Perdedor: Grovyle
+Ganador: Jirachi | Perdedor: Gabite
+Ganador: Jirachi | Perdedor: Banette
+Ganador: Jirachi | Perdedor: Hitmonchan
+Ganador: Jirachi | Perdedor: Luxio
+Ganador: Sharpedo | Perdedor: Grovyle

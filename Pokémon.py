@@ -14,14 +14,17 @@ COLORES_TIPO = {
     "ELECTRICO": "#F7D02C", "AGUA": "#6390F0", "FUEGO": "#EE8130",
     "PLANTA": "#7AC74C", "PSIQUICO": "#F95587", "SINIESTRO": "#705746",
     "FANTASMA": "#735797", "DRAGON": "#6F35FC", "LUCHA": "#C22E28",
-    "BICHO": "#A6B91A"
+    "BICHO": "#A6B91A",
+}
+
+MOVIMIENTOS_PRIORIDAD = {
+    "ATAQUE RÁPIDO","ACUA JET",
 }
 
 menu = ctk.CTk()
 menu.title("Simulador Pokémon")
 menu.geometry("1000x600")
 menu.resizable(False, False)
-
 
 def cargar_Pokemons():
     with open("pokemones_stats.csv", "r", encoding="utf-8") as archivo:
@@ -33,10 +36,10 @@ def cargar_Pokemons():
                 continue
 
             nombre = fila[0]
-            tipo_limpio = fila[1].split("/")[0].split("-")[0].strip().upper()
+            tipo = fila[1].split("/")[0].split("-")[0].strip().upper()
 
             Catalogo_Pokemon[nombre] = {
-                "tipo": tipo_limpio,
+                "tipo": tipo,
                 "vida": int(fila[2]),
                 "ataque": int(fila[3]),
                 "defensa": int(fila[4]),
@@ -183,7 +186,7 @@ def mostrar_catalogo():
         btn.grid(row=i // 4, column=i % 4, padx=9, pady=10)
         botones[nombre] = btn
 
-def cargar_frames_tk(ruta_gif, zoom=2.4):
+def cargar_frames_tk(ruta_gif, zoom):
     gif = Image.open(ruta_gif)
     frames = []
     for frame in ImageSequence.Iterator(gif):
@@ -238,10 +241,10 @@ def iniciar_batalla():
         animar_sprite(sprite_rival, frames_rival)
 
     panel_rival = ctk.CTkFrame(menu, width=350, height=95, fg_color="#2B2B2B", border_color="#7D26CD", border_width=2, corner_radius=12)
-    panel_rival.place(x=95, y=20)
+    panel_rival.place(x=125, y=20)
     panel_rival.pack_propagate(False)
 
-    ctk.CTkLabel(panel_rival, text=f"{pkm_rival['nombre'].upper()}", font=("Arial", 14, "bold"), text_color="white").pack(anchor="w", padx=15, pady=(10, 4))
+    ctk.CTkLabel(panel_rival, text=f"{pkm_rival['nombre'].upper()}  (VEL: {pkm_rival['velocidad']})", font=("Arial", 14, "bold")).pack(anchor="w", padx=15, pady=(10, 4))
 
     barra_hp_rival = ctk.CTkProgressBar(panel_rival, width=265, height=18, progress_color="#4CAF50", fg_color="#555555")
     barra_hp_rival.set(1.0)
@@ -251,10 +254,10 @@ def iniciar_batalla():
     lbl_hp_rival.pack(anchor="e", padx=15, pady=(2, 6))
 
     panel_jugador = ctk.CTkFrame(menu, width=350, height=95, fg_color="#2B2B2B", border_color="#1E90FF", border_width=2, corner_radius=12)
-    panel_jugador.place(x=550, y=330)
+    panel_jugador.place(x=520, y=330)
     panel_jugador.pack_propagate(False)
 
-    ctk.CTkLabel(panel_jugador, text=f"{pkm_jugador['nombre'].upper()}", font=("Arial", 14, "bold"), text_color="white").pack(anchor="w", padx=15, pady=(10, 4))
+    ctk.CTkLabel(panel_jugador, text=f"{pkm_jugador['nombre'].upper()}  (VEL: {pkm_jugador['velocidad']})", font=("Arial", 14, "bold")).pack(anchor="w", padx=15, pady=(10, 4))
 
     barra_hp_jugador = ctk.CTkProgressBar(panel_jugador, width=265, height=18, progress_color="#4CAF50", fg_color="#555555")
     barra_hp_jugador.set(1.0)
@@ -275,7 +278,6 @@ def iniciar_batalla():
         caja_texto,
         text=f"¡Un {pkm_rival['nombre'].upper()} salvaje apareció!\n¿Qué debería hacer {pkm_jugador['nombre'].upper()}?",
         font=("Arial", 15, "bold"),
-        text_color="white",
         justify="left",
         wraplength=455
     )
@@ -285,6 +287,83 @@ def iniciar_batalla():
     caja_botones.place(x=520, y=15)
     caja_botones.grid_propagate(False)
 
+    def guardar_resultado(ganador, perdedor):
+        with open("historial_batallas.txt", "a", encoding="utf-8") as archivo:
+            archivo.write(f"Ganador: {ganador} | Perdedor: {perdedor}\n")
+
+    def actualizar_hud():
+        barra_hp_jugador.set(pkm_jugador["vida"] / pkm_jugador["vida_max"])
+        lbl_hp_jugador.configure(text=f"HP: {pkm_jugador['vida']} / {pkm_jugador['vida_max']}")
+
+        barra_hp_rival.set(pkm_rival["vida"] / pkm_rival["vida_max"])
+        lbl_hp_rival.configure(text=f"HP: {pkm_rival['vida']} / {pkm_rival['vida_max']}")
+
+    def obtener_prioridad(pkm, accion):
+        if accion == "move1" and pkm["move1"].strip().upper() in MOVIMIENTOS_PRIORIDAD:
+            return 1
+        if accion == "move2" and pkm["move2"].strip().upper() in MOVIMIENTOS_PRIORIDAD:
+            return 1
+        return 0
+
+    def ejecutar_accion(atacante, defensor, accion):
+        if accion == "move1":
+            dano = max(1, atacante["dmg1"] + atacante["ataque"] - defensor["defensa"])
+            defensor["vida"] = max(0, defensor["vida"] - dano)
+            return f"¡{atacante['nombre']} usó {atacante['move1']} e hizo {dano} de daño"
+        elif accion == "move2":
+            dano = max(1, atacante["dmg2"] + atacante["ataque"] - defensor["defensa"])
+            defensor["vida"] = max(0, defensor["vida"] - dano)
+            return f"¡{atacante['nombre']} usó {atacante['move2']} e hizo {dano} de daño"
+        elif accion == "curar":
+            atacante["vida"] = min(atacante["vida_max"], atacante["vida"] + 20)
+            return f"¡{atacante['nombre']} recuperó 20 HP"
+        elif accion == "bajar_def":
+            defensor["defensa"] = max(0, defensor["defensa"] - 4)
+            return f"¡{atacante['nombre']} bajó 4 puntos la defensa de {defensor['nombre']}"
+
+    def turno_batalla(accion_jugador):
+        accion_rival = random.choice(["move1", "move2", "bajar_def"])
+        if pkm_rival["vida"] < 30 and random.randint(1, 5) > 2:
+            accion_rival = "curar"
+
+        prio_j = obtener_prioridad(pkm_jugador, accion_jugador)
+        prio_r = obtener_prioridad(pkm_rival, accion_rival)
+
+        if prio_j != prio_r:
+            jugador_primero = prio_j > prio_r
+        elif pkm_jugador["velocidad"] != pkm_rival["velocidad"]:
+            jugador_primero = pkm_jugador["velocidad"] > pkm_rival["velocidad"]
+        else:
+            jugador_primero = random.choice([True, False])
+
+        if jugador_primero:
+            orden = [
+                (pkm_jugador, pkm_rival, accion_jugador),
+                (pkm_rival, pkm_jugador, accion_rival)
+            ]
+        else:
+            orden = [
+                (pkm_rival, pkm_jugador, accion_rival),
+                (pkm_jugador, pkm_rival, accion_jugador)
+            ]
+
+        mensajes = []
+
+        for atacante, defensor, accion in orden:
+            texto = ejecutar_accion(atacante, defensor, accion)
+            mensajes.append(texto)
+            actualizar_hud()
+
+            if defensor["vida"] == 0:
+                mensajes.append(f"¡{defensor['nombre']} se debilitó! ¡{atacante['nombre']} gana!")
+                lbl_mensaje.configure(text="\n".join(mensajes))
+                guardar_resultado(atacante["nombre"], defensor["nombre"])
+                for b in (btn_move1, btn_move2, btn_bajar_def, btn_curar):
+                    b.configure(state="disabled")
+                return
+
+        lbl_mensaje.configure(text="\n".join(mensajes))
+
     color_tipo = COLORES_TIPO.get(pkm_jugador["tipo"], "#1E90FF")
 
     btn_move1 = ctk.CTkButton(
@@ -292,10 +371,10 @@ def iniciar_batalla():
         text=f"{pkm_jugador['move1'].upper()}\n(Daño: {pkm_jugador['dmg1']})",
         font=("Arial", 13, "bold"),
         fg_color=color_tipo,
-        text_color="white",
         width=225,
         height=65,
-        corner_radius=10
+        corner_radius=10,
+        command=lambda: turno_batalla("move1")
     )
     btn_move1.grid(row=0, column=0, padx=(0, 7), pady=(0, 7))
 
@@ -304,49 +383,38 @@ def iniciar_batalla():
         text=f"{pkm_jugador['move2'].upper()}\n(Daño: {pkm_jugador['dmg2']})",
         font=("Arial", 13, "bold"),
         fg_color=color_tipo,
-        text_color="white",
         width=225,
         height=65,
-        corner_radius=10
+        corner_radius=10,
+        command=lambda: turno_batalla("move2")
     )
     btn_move2.grid(row=0, column=1, padx=(7, 0), pady=(0, 7))
 
     btn_bajar_def = ctk.CTkButton(
         caja_botones,
-        text="GRITO / BAJAR DEFENSA\n(-Defensa Rival)",
+        text="GRITO / BAJAR DEFENSA\n(-4 DEF Rival)",
         font=("Arial", 13, "bold"),
         fg_color="#D97706",
         hover_color="#B45309",
-        text_color="white",
         width=225,
         height=65,
-        corner_radius=10
+        corner_radius=10,
+        command=lambda: turno_batalla("bajar_def")
     )
     btn_bajar_def.grid(row=1, column=0, padx=(0, 7), pady=(7, 0))
 
     btn_curar = ctk.CTkButton(
         caja_botones,
-        text="RECUPERACIÓN\n(+Curar Vida)",
+        text="RECUPERACIÓN\n(+20 HP)",
         font=("Arial", 13, "bold"),
         fg_color="#2E8B57",
         hover_color="#226B42",
-        text_color="white",
         width=225,
         height=65,
-        corner_radius=10
+        corner_radius=10,
+        command=lambda: turno_batalla("curar")
     )
     btn_curar.grid(row=1, column=1, padx=(7, 0), pady=(7, 0))
-
-    ctk.CTkButton(
-        menu,
-        text="Cambiar Pokémon",
-        font=("Arial", 12, "bold"),
-        fg_color="#C22E28",
-        hover_color="#8B1E1A",
-        width=150,
-        height=35,
-        command=mostrar_catalogo
-    ).place(x=830, y=20)
 
 cargar_Pokemons()
 mostrar_menu()
