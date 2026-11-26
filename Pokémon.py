@@ -387,8 +387,6 @@ def iniciar_batalla():
                     b.configure(state="disabled")
                 return
 
-
-
         lbl_mensaje.configure(text="\n".join(mensajes))
 
     color_tipo = COLORES_TIPO.get(pkm_jugador["tipo"], "#1E90FF")
