@@ -1,0 +1,6 @@
+1. Abrir la carpeta "Pokemon" en tu computadora.
+2. Asegurarse de que todos los archivos necesarios estén presentes en la carpeta Pokemones (back, fondo, front, icon, Sonidos, icono y logo).
+3. Abrir el archivo Pokemon.py en un editor de código o IDE de tu preferencia.
+4. Descargar los paquetes necesarios para ejecutar el código, como Pygame, Pillow y cutom tkinter si aún no los tienes instalados.
+5. Ejecutar el archivo Pokemon.py para iniciar el juego.
+6. Disfrutar del juego y explorar las diferentes funcionalidades que ofrece.
